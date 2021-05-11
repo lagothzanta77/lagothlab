@@ -42,7 +42,7 @@ A 2 soros bash szkript ami indítja a virtuális gépet:
   * `export QEMU_AUDIO_DRV=pa` : QEMU a pulseadio hangrendszert használja.
   * `sudo -u virtmagus` : az ezután következő parancsot a virtmagus nevű user nevében futtatja
   * `kvm` : kvm :-)
-  * `-monitor telnet:127.0.0.1:40010,server,nowait,ipv4` : telnet típusú server socketet nyit ipv4-en localhoston 40010-es porton virtuális gép spec. vezérléséhez (pl. `telnet localhost 40010` parancs. Amennyiben ssh local port forwarding-al léptünk be linux host-ra, a virtuális gépeket más gépről más rendszerről (pl. windows) is elérhetjük).
+  * `-monitor telnet:127.0.0.1:40010,server,nowait,ipv4` : telnet típusú server socketet nyit ipv4-en localhoston 40010-es porton virtuális gép spec. vezérléséhez (pl. `telnet localhost 40010` parancs. Amennyiben ssh local port forwarding-al léptünk be linux host-ra, a virtuális gépeket más gépről más rendszerről (pl. windows) is elérhetjük titkosított kommunikációs csatornán).
   * `-object input-linux,id=kbd1,evdev=/dev/input/by-path/platform-i8042-serio-0-event-kbd,grab_all=on,repeat=on` : lecsatolja a host rendszerről a billentyűzetet, és átadja a hardvert a virtuális gép részére, így a host számára a billentyűzet nem létezik a virtuális gép futása alatt. Ezért ajánlott egy másodlagos billentyűzet...A grab_all hogy minden "gombot" átadjon, a repeat=on, engedi a bill. ismétlést. Ez egy veszélyes opció, bizonyos 3D programok számára szükséges lehet. Pl. ahol ugyanazt a gombot kell sokszor nyomkodni egymás után.Az elérési út (by-path) rendszerenként eltérhet
   * `-usb` : virtuális usb bus hozzáadása a virtuális géphez
   * `-device usb-mouse` : virtuális usb egér - mint beviteli eszköz - hozzáadása a virtuális usb buszhoz. Azt hiszem ez jobb mint az emulált PS/2 egér
