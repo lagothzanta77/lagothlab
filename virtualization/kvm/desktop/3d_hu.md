@@ -28,7 +28,7 @@
 > **Egyéb Információ**
 
   * Az egyszerűség kedvéért hálózat nélküli módban fut a virtuális gép. A hálózat beállítása egy külön témakör (VDE).
-  * [Utolsó Stabil Virtio Driver CD ISO windows 8+ rendszerhez](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso)
+  * [Utolsó Stabil Virtio Driver CD ISO windows 8+ rendszerhez](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso) : Qemu virtio meghajtóprogramok Windows 8+ rendszerhez
   * [Teljes QEMU Monitor help](https://qemu-project.gitlab.io/qemu/system/monitor.html)
 
 
