@@ -92,7 +92,7 @@ Majd az `sconfig` parancssal célszerű átírni a gépnevet pl. CORE-ra. Ezutá
 
 ![](img/corename.png)
 
-Majd ismét `sconfig` és beállítani a hálózatot a 8-as menüponttal:
+Majd ismét `sconfig` és beállítani az időt, **időzónát** a 9-es és a hálózatot a 8-as menüponttal:
 
 ![](img/topology.png)
 
