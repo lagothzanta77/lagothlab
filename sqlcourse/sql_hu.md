@@ -67,7 +67,7 @@ Amennyiben használsz korlátozó tűzfalszabályokat az iptables FORWARD tábl�
 
 > **2. lépés: virtuális Windows 2016 Server létrehozása**
 
- * `qemu-img create w2016.raw 22G` parancssal létre kell hozni a merevlemezt amire a win2016 server kerül.
+ * `qemu-img create w2016.raw 34G` parancssal létre kell hozni a merevlemezt amire a win2016 server kerül.
 
  * Virtuális gép elindítása célszerű bash szkriptből:
 
@@ -148,4 +148,33 @@ Ne felejtsd el, hogy a terminal asztali kliensről ssh tunnelt be kell állítan
 
 ![](img/admincenter2.png)
 
-TODO...
+Ha helyhiány lép fel, a virtuális gép leállítása ki tudod terjeszteni a virtuális rendszermerevlemezt is.
+
+`qemu-img info w2016.raw`
+
+kiírja hogy mennyi a virtuális merevlemez mérete (34G), jelenleg mennyi helyet foglal merevlemezen (26G)
+
+Pl. Így lehet 8G-vel megnövelni: (A RAW formátumot csak lecsatolt nem használt állapotban lehet átméretezni)
+
+`qemu-img resize -f raw w2016.raw +8G`
+
+Ezután :
+
+`qemu-img info w2016.raw`
+
+parancs kimenete:
+
+`image: w2016.raw`
+
+`file format: raw`
+
+`virtual size: 42G (45097156608 bytes)`
+
+`disk size: 26G`
+
+
+Ez csak a virtuális merevlemez "fizikai" mérete, még a rendszerpartíciót is meg kell növelni (NTFS), pl. admincenter révén.
+
+![](img/resizedisk.png)
+
+TODO
