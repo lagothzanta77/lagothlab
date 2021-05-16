@@ -177,4 +177,11 @@ Ez csak a virtuális merevlemez "fizikai" mérete, még a rendszerpartíciót is
 
 ![](img/resizedisk.png)
 
-TODO
+A korábbi frissítések, összevont patchek eltávolításával is lehet helyet sprórolni:
+
+`Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase`
+
+A parancs forrása [itt](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/clean-up-the-winsxs-folder).
+
+A qemu monitoros telnet parancsok is szkriptelhetőek except segítségével. [Itt](scripts/expectexample.sh) egy mintapélda ami az "info status" parancsot futtatja. De le lehet cserélni pl. drive-backupra :-)
+
