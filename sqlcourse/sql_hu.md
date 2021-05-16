@@ -148,7 +148,7 @@ Ne felejtsd el, hogy a terminal asztali kliensről ssh tunnelt be kell állítan
 
 ![](img/admincenter2.png)
 
-Ha helyhiány lép fel, a virtuális gép leállítása ki tudod terjeszteni a virtuális rendszermerevlemezt is.
+Ha helyhiány lép fel, a virtuális gép leállítása után ki tudod terjeszteni a virtuális rendszermerevlemezt is.
 
 `qemu-img info w2016.raw`
 
