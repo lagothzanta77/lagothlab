@@ -76,7 +76,7 @@ Amennyiben használsz korlátozó tűzfalszabályokat az iptables FORWARD tábl�
 `kvm -daemonize -monitor telnet:127.0.0.1:33011,server,nowait,ipv4 -name windows2016 -smp 4 -rtc base=localtime -spice port=6090,addr=127.0.0.1,disable-ticketing,image-compression=off -vga qxl -k hu -m 4096 -drive file=w2016.raw,format=raw,if=ide -cdrom w2k16.iso -device virtio-serial-pci,id=virtio-serial0,max_ports=16,bus=pci.0,addr=0x5 -chardev spicevmc,name=vdagent,id=vdagent -device virtserialport,nr=1,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0 -soundhw hda -boot d -net nic,macaddr=cb:31:0f:29:38:7f -net vde`
 
 A qemu telnet port localhost:33011-ra, a képernyő a spice protokollon localhost:6090-re kerül a másik fizikai gépről ssh tunnellel problémamentesen elérhetőek. A -cdrom csatolja be a telepítőcd-t, illetve előkészíti a spice agent használatát, hangra server esetében nincs szükség.A MAC cím szabadon választható, csak olyan legyen amit másik eszköz még nem használ. 4G RAM-ot használ a virtuális gép.
-Egy 8 total thread-es (`core*thread`) processzor esetében (`cat /proc/cpuinfo | grep -c proc`) 4-et adhatsz a servernek, egy marad a gazdarendszernek és 3 jut majd az AD kliensnek. 8G RAM esetén 4G mehet a servernek, 3,5G mehet a kliensnek a hostnak elég 500 MB.
+Egy 8 total thread-es (`core*thread`) processzor esetében (`cat /proc/cpuinfo | grep -c proc`) 4-et adhatsz a servernek, egy marad a gazdarendszernek és 3 jut majd az AD kliensnek.
 
 Telepítéskor a Standard Evaluation teszi fel a Win2k16 core servert. A terminálos gépről ssh tunnel-en keresztül elérhető a 33011-es port `telnet localhost 33011` parancssal amennyiben a terminál szintén a 33011-et használja a tunnelhez.
 
@@ -177,11 +177,44 @@ Ez csak a virtuális merevlemez "fizikai" mérete, még a rendszerpartíciót is
 
 ![](img/resizedisk.png)
 
-A korábbi frissítések, összevont patchek eltávolításával is lehet helyet sprórolni:
+A korábbi frissítési fájlok, összevont patchek telepítőkészletének eltávolításával is lehet helyet sprórolni:
 
 `Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase`
 
 A parancs forrása [itt](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/clean-up-the-winsxs-folder).
 
 A qemu monitoros telnet parancsok is szkriptelhetőek except segítségével. [Itt](scripts/expectexample.sh) egy mintapélda ami az "info status" parancsot futtatja. De le lehet cserélni pl. drive-backupra :-)
+
+> **3. lépés: Egy windows 10-es PRO klienst kell telepíteni**
+
+ (pl. w10p.img mint raw disk image,monitor port 33021,spice port 6091) a virtuális hálózatba 192.168.2.217/24-es ip címmel a példa alapján.
+ 
+Erre lehet webdavot is telepíteni. Itt is kell spice-guest-tools, és ajánlott mellé spice-webdavd szolgáltatást is telepíteni. [Itt](https://www.spice-space.org/download/windows/spice-webdavd/spice-webdavd-x64-latest.msi) elérhető.
+
+`export QEMU_AUDIO_DRV=spice`
+
+`kvm -daemonize -name windows10 -monitor telnet:127.0.0.1:33021,server,nowait,ipv4 -smp 3 -rtc base=localtime -spice port=6091,addr=127.0.0.1,disable-ticketing,image-compression=off -vga qxl -k hu -m 2560 -drive file=w10p.img,format=raw,if=ide -cdrom Win10_20H2_v2_Hungarian_x64.iso -device virtio-serial-pci,id=virtio-serial0,max_ports=16,bus=pci.0,addr=0x5 -chardev spicevmc,name=vdagent,id=vdagent -device virtserialport,nr=1,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0 -soundhw hda -boot d -net nic,macaddr=cb:31:0f:29:3b:70 -device virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=org.spice-space.webdav.0 -chardev spiceport,name=org.spice-space.webdav.0,id=charchannel1 -net vde`
+
+A spice kliensben ezután meg tudsz adni egy mappát a desktop (terminal) gépen, ami hálózati meghajtóként elérhető a laptopon (server) futó virtuális (kvm) win10 kliens számára. Így ide is könnyen be lehet juttatni/ki lehet szedni fájlokat. Ennek a hálózati meghajtónak jobb a teljesítménye, mint az RDP-nek.
+
+pl. `spicy --spice-shared-dir=./spicy`
+
+![](img/webdav.png)
+
+Sajnos a 2. virtuális gép a laptopon már valószínűleg lassan indul. A bootolás sajnos lassú gépen lassú lesz. Bootolás befejeződése után már használható sebessége van.
+
+Itt már meg tudsz adni hang kimenetet is (spice), úgyhogy a windows kliensnek lesz hangja amit ssh tunnelen keresztül az asztali (terminal) géped hangkimenetén hallasz.
+
+Most telepítsd fel a windows szolgáltatásokból az [RSAT](https://docs.microsoft.com/en-us/troubleshoot/windows-server/system-management-components/remote-server-administration-tools) modulokat.
+
+![](img/rsat.png)
+
+Az AD Domain Services, a DNS Server, a kiszolgálókezelő, és a csoportházirendes cucc mindenképpen legyen fent.
+
+Az ADMIN centerből lehet kezelni a server lokális beállításait ( eszközkezelő, merevlemez), de az active directoryt mint logikai egységet csak nehézkesen. Ezek majd ahhoz kellenek.
+
+
+TODO
+
+
 
