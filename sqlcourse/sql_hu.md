@@ -3,8 +3,8 @@
 > **HOZZÁVALÓK**
 
  * 2 db számítógép (a példában egy laptop 8G RAM-al, egy desktop 4G RAM-al)
- * valamilyen virtualizációs rendszer ismerete, használata windows gazdarendszerekre inkább vmware, linuxra inkább kvm.
- * A kvm-servernek szánt gépen nem kell bejelentkezni. Minimálisan szükséges erőforrási igénye: max 300 Mbyte RAM, 1 processzor "szál". (`cat /proc/cpuinfo | grep -c proc`). Ha a rendszeren a vbetool nem működik a képernyő lekapcsolására parancssori felületen az sddm gui bejelentkező használható képernyő lekapcsoláshoz (xorg dpms serverflags). Amennyiben működik pl. systemctl stop sddm-el lekapcsolható egy sddm gui ablakkezelő.
+ * valamilyen virtualizációs rendszer ismerete, használata windows gazdarendszerekre inkább hyper-v, vagy vmware - inkább esxi mint workstation player -, linuxra inkább kvm.
+ * A kvm-servernek szánt gépen nem kell bejelentkezni. Ha a rendszeren a vbetool nem működik a képernyő lekapcsolására parancssori felületen az sddm gui bejelentkező használható képernyő lekapcsoláshoz (xorg dpms serverflags). Amennyiben működik pl. systemctl stop sddm-el lekapcsolható egy sddm gui ablakkezelő.
  * ssh és sshfs kapcsolat a terminálnak szánt rendszerről a servernek szánt rendszerre. ssh tunnel kell (!!)
  * telepített fuse,ntfs-3g csatolási segédeszközök
 
@@ -12,7 +12,7 @@
 
 ![](img/home1.png)
 
-> **1. lépés: VDE Telepítése laptop 8G serverre, ha VMWARE-t használsz ez elhagyható**
+> **1. lépés: VDE Telepítése laptop 8G serverre, ha VMWARE-t/hyper-V-t használsz ez elhagyható**
 
 `apt install vde2`
 
@@ -73,10 +73,10 @@ Amennyiben használsz korlátozó tűzfalszabályokat az iptables FORWARD tábl�
 
 `export QEMU_AUDIO_DRV="none"`
 
-`kvm -daemonize -monitor telnet:127.0.0.1:33011,server,nowait,ipv4 -name windows2016 -smp 4 -rtc base=localtime -spice port=6090,addr=127.0.0.1,disable-ticketing,image-compression=off -vga qxl -k hu -m 4096 -drive file=w2016.raw,format=raw,if=ide -cdrom w2k16.iso -device virtio-serial-pci,id=virtio-serial0,max_ports=16,bus=pci.0,addr=0x5 -chardev spicevmc,name=vdagent,id=vdagent -device virtserialport,nr=1,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0 -soundhw hda -boot d -net nic,macaddr=cb:31:0f:29:38:7f -net vde`
+`kvm -daemonize -monitor telnet:127.0.0.1:33011,server,nowait,ipv4 -name windows2016 -smp 4 -rtc base=localtime -spice port=6090,addr=127.0.0.1,disable-ticketing,image-compression=off -vga qxl -k hu -m 3072 -drive file=w2016.raw,format=raw,if=ide -cdrom w2k16.iso -device virtio-serial-pci,id=virtio-serial0,max_ports=16,bus=pci.0,addr=0x5 -chardev spicevmc,name=vdagent,id=vdagent -device virtserialport,nr=1,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0 -soundhw hda -boot d -net nic,macaddr=cb:31:0f:29:38:7f -net vde`
 
-A qemu telnet port localhost:33011-ra, a képernyő a spice protokollon localhost:6090-re kerül a másik fizikai gépről ssh tunnellel problémamentesen elérhetőek. A -cdrom csatolja be a telepítőcd-t, illetve előkészíti a spice agent használatát, hangra server esetében nincs szükség.A MAC cím szabadon választható, csak olyan legyen amit másik eszköz még nem használ. 4G RAM-ot használ a virtuális gép.
-Egy 8 total thread-es (`core*thread`) processzor esetében (`cat /proc/cpuinfo | grep -c proc`) 4-et adhatsz a servernek, egy marad a gazdarendszernek és 3 jut majd az AD kliensnek.
+A qemu telnet port localhost:33011-ra, a képernyő a spice protokollon localhost:6090-re kerül a másik fizikai gépről ssh tunnellel problémamentesen elérhetőek. A -cdrom csatolja be a telepítőcd-t, illetve előkészíti a spice agent használatát, hangra server esetében nincs szükség.A MAC cím szabadon választható, csak olyan legyen amit másik eszköz még nem használ. 3G RAM-ot használ a virtuális gép.
+Egy 8 total thread-es (`core*thread`) processzor esetében (`cat /proc/cpuinfo | grep -c proc`) 4-t adhatsz a servernek, 2 marad a gazdarendszernek és 2 jut majd az AD kliensnek.
 
 Telepítéskor a Standard Evaluation teszi fel a Win2k16 core servert. A terminálos gépről ssh tunnel-en keresztül elérhető a 33011-es port `telnet localhost 33011` parancssal amennyiben a terminál szintén a 33011-et használja a tunnelhez.
 
@@ -193,9 +193,9 @@ Erre lehet webdavot is telepíteni. Itt is kell spice-guest-tools, és ajánlott
 
 `export QEMU_AUDIO_DRV=spice`
 
-`kvm -daemonize -name windows10 -monitor telnet:127.0.0.1:33021,server,nowait,ipv4 -smp 3 -rtc base=localtime -spice port=6091,addr=127.0.0.1,disable-ticketing,image-compression=off -vga qxl -k hu -m 2560 -drive file=w10p.img,format=raw,if=ide -cdrom Win10_20H2_v2_Hungarian_x64.iso -device virtio-serial-pci,id=virtio-serial0,max_ports=16,bus=pci.0,addr=0x5 -chardev spicevmc,name=vdagent,id=vdagent -device virtserialport,nr=1,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0 -soundhw hda -boot d -net nic,macaddr=cb:31:0f:29:3b:70 -device virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=org.spice-space.webdav.0 -chardev spiceport,name=org.spice-space.webdav.0,id=charchannel1 -net vde`
+`kvm -daemonize -name windows10 -monitor telnet:127.0.0.1:33021,server,nowait,ipv4 -smp 2 -rtc base=localtime -spice port=6091,addr=127.0.0.1,disable-ticketing,image-compression=off -vga qxl -k hu -m 3584 -drive file=w10p.img,format=raw,if=ide -cdrom Win10_20H2_v2_Hungarian_x64.iso -device virtio-serial-pci,id=virtio-serial0,max_ports=16,bus=pci.0,addr=0x5 -chardev spicevmc,name=vdagent,id=vdagent -device virtserialport,nr=1,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0 -soundhw hda -boot d -net nic,macaddr=cb:31:0f:29:3b:70 -device virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=org.spice-space.webdav.0 -chardev spiceport,name=org.spice-space.webdav.0,id=charchannel1 -net vde`
 
-A spice kliensben ezután meg tudsz adni egy mappát a desktop (terminal) gépen, ami hálózati meghajtóként elérhető a laptopon (server) futó virtuális (kvm) win10 kliens számára. Így ide is könnyen be lehet juttatni/ki lehet szedni fájlokat. Ennek a hálózati meghajtónak jobb a teljesítménye, mint az RDP-nek.
+A spice kliensben ezután meg tudsz adni egy mappát a desktop (terminal) gépen, ami hálózati meghajtóként elérhető a laptopon (server) futó virtuális (kvm) win10 kliens számára. Így ide is könnyen be lehet juttatni/ki lehet szedni fájlokat. Ennek a hálózati meghajtónak jobb a teljesítménye, mint az RDP-nek. A Management Studonak sok ramra van szüksége, ezért a kliens kap többet 3,5 G-t a példában.
 
 pl. `spicy --spice-shared-dir=./spicy`
 
@@ -214,7 +214,124 @@ Az AD Domain Services, a DNS Server, a kiszolgálókezelő, és a csoportházire
 Az ADMIN centerből lehet kezelni a server lokális beállításait ( eszközkezelő, merevlemez), de az active directoryt mint logikai egységet csak nehézkesen. Ezek majd ahhoz kellenek.
 
 
-TODO
+> **4. lépés: A win 10-et be kell léptetni a tartományba (sqlcourse.local)**
+
+Át kell írni a DNS servert a DC server (core) ip címére.
+
+![](img/domain1.png)
+
+Ellenőrzés ping-el, ha válaszol, be lehet léptetni a korábban létrehozott domain admin userrel (archmage)
+
+![](img/domain2.png)
+
+Ennyi.
+
+![](img/domain3.png)
 
 
+Újraindítás és core server admin joggal történő bejelentkezés után egy `mmc.exe` futtatásával hozzá lehet adni az `Active Domain Users and Computers`-t. Mindjárt érdemes hozzáadnod magadnak `Domain Admin` csoporttagságot, és legyen ez az elsődleges csoport. Sok hozzáférési problémát megold. A core server engedi fogja erről a gépről a kapcsolatot, mivel az AD telepítésekor használt powershell szkript előrelátóan tartalmazta a szükséges tűzfalszabályt erre a windows 10-es kliensgépre. (192.168.2.217)
 
+![](img/domain4.png)
+
+Ne felejtsd el hozzáadni a DNS serverhez  - csatlakozáskor a számítógép neve a core server neve ( itt pl. CORE ) - a hálózat reverse lookup zónáját!
+
+![](img/dnsserver.png)
+
+> **5. lépés: SQL Server telepítési előkészületei**
+
+  * Az SQL servernek majd 4 darab spec. felhasználóra van szüksége tartományi szinten, akinek nevében futtatja majd a cuccát. Mivel DC-n fog futni ezért `domain managed service user`-ekre lesz szüksége. Hozd őket létre ! Valamint készíts 2 normál domain usert is (pl. wizard, magician). Az egyik lesz az sql. másik az analysis administrator. A domainben nekik normál felhasználói joguk, az sql-ben/analysis service-ben adminisztrátori joguk lesz.
+
+![](img/sqlservice1.png)
+
+![](img/sqlservice2.png)
+
+A másik kettőt ugyanígy.
+
+ 1. SQL service
+ 1. Analysis Service
+ 1. Agent Service
+ 1. Integrated Service
+
+**Mindegyiknek fontos hogy megfelelő jelszava legyen. A jelszót ne felejtsd el**
+
+
+A Windows 10-en administratori módban indított `windows powershell` -ben kiadott
+
+ `Enable-PSRemoting`
+
+után már windows admin centerből kezelhető ez a gép is - ebben a példában archmage@sqlcourse.local néven -, a tárolók között a webdav-os spice hálózati meghajtó viszont nem feltétlen jelenik meg az admin centerben.
+Ezután a Windows 10 lokális meghajtói is elérhetőek az Admin Centerből, eltávolíthatod róla a spice-webdavd-t ha akarod.
+
+![](img/winrm.png)
+
+A két rendszert egy szkriptből is el tudod indítani, de érdemes úgy megírni (mint ebben a példában), hogy amíg nem tudod pingelni a DC-t addig ne indítsd el a klienset. Ugyanis a DC-nek több mindent kell elindítani, a bootolás jobban terheli a host processzorát, és amíg a DC nem működik a kliens sem tud rá bejelentkezni. 
+Egy példa [itt](scripts/winAD.sh) elérhető. 
+
+A windows2016server.sh tartalmazza a serverindítási kvm parancsot a windows10pro a kliensét a kettő között pedig van egy kis késleltetés.
+
+Most le kell tölteni az sql server developer edition ISO fájlt valamelyik gépre az sql netes telepítővel.
+Az én választásom a core server.
+
+Az [SQL Server 2019](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)-es [itt](https://go.microsoft.com/fwlink/?linkid=866662) érhető el.
+
+![](img/sqlsetuppre.png)
+
+Admin centerrel át kell másolni a kvm-es gazdagépre (laptop). Ezután a letöltött iso fájl a virtuális gépről már törölhető. Ha KVM helyett vmware/hyper-v t használsz windowsos HOST-on , akkor közvetlenül indíthatod a netes telepítőd és letöltheted egyből a gazdagépre az iso fájlt.
+
+![](img/sqldeveliso1.png)
+
+A server virtuális cd meghajtójában eddig a win2016 telepítő volt, ki kell cserélni az sql telepítőlemezre.
+
+![](img/develiso.png)
+
+Ezután a `D:\` meghajtón már az sql telepítő érhető el. Ez élő rendszeren elvégezhető, nem kell lekapcsolni a virtuális gépet.
+
+> **6. lépés: SQL server telepítése a Domain Controlleren.**
+
+Nem tartják jó ötletnek DC-re telepíteni, de ez egy labor környezet oktatási célra korlátozott erőforrásokkal. Itt az SQL server DC-n lesz.
+
+A megfelelően előregyártott szkripttel (batch fájl, [itt](scripts/sqlsetup.bat) elérhető) és a hozzá kapcsolódó telepítési beállítóval (ini fájl, [itt](scripts/sqlinstall.ini) elérhető) a telepítést automatikusan elvégezheted, az sql domain administrator a wizard felhasználó lesz a példában.
+
+**A batch fájlban a jelszavakat át kell írnod arra, amit megadtál a 4 db sql domain service account létrehozásakor.**
+
+
+Az SQL instance a c:\mssql könyvtárba kerül.
+
+A példaszkriptek a core serveren a `c:\mytools\" mappában vannak. A telepítő cd pedig a D:\ meghajtón.
+
+Ez a szkript sem kérdez semmit.
+
+![](img/sqlsetup2.png)
+
+Ezzel az sql server telepítése kész.
+
+> **7. lépés: SQL Server beállítása**
+
+A win10pro-ra lépj be az sql administrator (domain user) kóddal. (itt: wizard), majd az sql serverbe mssms-val.
+
+![](img/wizconnect.png)
+
+Állítsd át a servert windows auth + **sql auth** módba.
+
+![](img/wizconnect2.png)
+
+Indítsd újra az sql service-t (pl. admin centerből)
+
+![](img/servrestart.png)
+
+Hozz létre egy teljes jogú sql auth. módú sql felhasználót. (pl. sorcerer)
+
+![](img/sorcerer1.png)
+
+Ha mindent alapbeállításon hagytál 1. bejelentkezés után jelszót kell cserélned.
+
+![](img/sorcerer2.png)
+
+Ezzel a core serveren tudsz parancssori sqlcmd-t használni
+
+![](img/sorcerer3.png)
+
+Ha van másik nem windowsos géped a hálózaton azure data studióval rá tudsz csatlakozni a serverre
+a win10p helyett. Ehhez szükséged lehet a core serveren tűzfal állításra.
+
+![](img/sorcerer4.png)
