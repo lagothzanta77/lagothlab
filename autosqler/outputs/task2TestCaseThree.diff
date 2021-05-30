@@ -1,0 +1,14 @@
+--- /tmp/selector.log	2021-05-30 21:59:29.000000000 +0200
++++ /mnt/cucc/mygit/traning/autosqler/testgood2.log	2021-05-30 16:57:14.000000000 +0200
+@@ -1,7 +1,7 @@
+ Changed database context to 'LW'.
+-id          name                                               type                                               effectAgainstUndead  effectAgainstDarklord effectAgainstHelghast weapontype_id id          weaponsname          combatskillbonus
+------------ -------------------------------------------------- -------------------------------------------------- -------------------- --------------------- --------------------- ------------- ----------- -------------------- ----------------
+-          7 spell spear                                        spear                                              normal               none                  normal                            1           1 spear                               0
+-          6 sommerswerd                                        broadsword                                         8 and double         8 and double          8 and double                      6           6 broadsword                          0
++name                                               type                                               effectAgainstHelghast
++-------------------------------------------------- -------------------------------------------------- ---------------------
++spell spear                                        spear                                              normal               
++sommerswerd                                        broadsword                                         8 and double         
+ 
+ (2 rows affected)
