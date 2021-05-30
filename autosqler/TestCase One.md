@@ -4,7 +4,7 @@ Testing environment for **task 1**  preparing... at Sun May 30 20:27:42 CEST 202
 
 Testing environment for **task 1** is completed
 
-your restore code is [here](scripts/restorebyTestCase One.sql)
+your restore code is [here](https://github.com/lagothzanta77/lagothlab/blob/main/autosqler/scripts/restorebyTestCase One.sql)
 
 restore test is **passed** 2/2 points
 
@@ -12,7 +12,7 @@ Testing environment for **task 2**  preparing... at Sun May 30 20:30:09 CEST 202
 
 Testing environment for **task 2** is completed
 
-your select code is [here](scripts/selectbyTestCase One.sql)
+your select code is [here](https://github.com/lagothzanta77/lagothlab/blob/main/autosqler/scripts/selectbyTestCase One.sql)
 
 columns' test is **passed**. 1/1 point
 
