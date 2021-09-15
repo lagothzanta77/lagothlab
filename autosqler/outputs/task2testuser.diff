@@ -1,0 +1,14 @@
+--- /tmp/selector.log	2021-09-15 13:47:37.149988277 +0200
++++ /mnt/cucc/mygit/traning/autosqler/testgood2.log	2021-05-30 16:57:14.000000000 +0200
+@@ -1,4 +1,7 @@
+-Msg 911, Level 16, State 1, Server CORE, Line 1
+-Database 'LW' does not exist. Make sure that the name is entered correctly.
+-Msg 208, Level 16, State 1, Server CORE, Line 1
+-Invalid object name 'weapons'.
++Changed database context to 'LW'.
++name                                               type                                               effectAgainstHelghast
++-------------------------------------------------- -------------------------------------------------- ---------------------
++spell spear                                        spear                                              normal               
++sommerswerd                                        broadsword                                         8 and double         
++
++(2 rows affected)
