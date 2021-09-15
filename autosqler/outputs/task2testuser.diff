@@ -1,0 +1,11 @@
+--- /tmp/selector.log	2021-09-15 14:22:48.533085023 +0200
++++ /mnt/cucc/mygit/traning/autosqler/testgood2.log	2021-05-30 16:57:14.000000000 +0200
+@@ -1,7 +1,7 @@
+ Changed database context to 'LW'.
+ name                                               type                                               effectAgainstHelghast
+ -------------------------------------------------- -------------------------------------------------- ---------------------
+-sommerswerd                                        broadsword                                         8 and double         
+ spell spear                                        spear                                              normal               
++sommerswerd                                        broadsword                                         8 and double         
+ 
+ (2 rows affected)
